@@ -1,4 +1,4 @@
-import { LoginForm } from "@/components/LoginForm/LoginForm"
+import { RegisterForm } from "@/components/RegisterForm/RegisterForm"
 
 export default function AuthenticationPage() {
   return (
@@ -6,13 +6,13 @@ export default function AuthenticationPage() {
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
         <div className="flex flex-col space-y-2 text-center">
           <h1 className="text-2xl font-semibold tracking-tight">
-            Entrar na Conta
+            Criar Conta
           </h1>
           <p className="text-sm text-muted-foreground">
-            Informe seu e-mail e senha para continuar
+            Informe seu nome, e-mail e senha para cadastrar
           </p>
         </div>
-        <LoginForm />
+        <RegisterForm />
         
       </div>
     </div>

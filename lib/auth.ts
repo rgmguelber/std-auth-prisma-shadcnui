@@ -1,4 +1,5 @@
 import { NextAuthOptions } from "next-auth";
+import bcrypt from 'bcrypt';
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import CredentialProvider from "next-auth/providers/credentials";
 import GithubProvider from "next-auth/providers/github";
@@ -22,11 +23,28 @@ export const authOptions: NextAuthOptions = {
         username: {label: "Nome", type: "text", placeholder: "Nome"}
       },
       async authorize(credentials, req): Promise<any> {
-        console.log('Authorize Method', credentials)
-        
-        const user = { email: "test@mail.com", password: "123456", name: "Teste"}
+        if(!credentials?.email || !credentials?.password) 
+          throw new Error("Dados de Login necessarios")
 
-        return user;
+        const user = await db.user.findUnique({
+            where:{
+                email: credentials?.email
+            }
+        })
+
+        if(!user || !user.hashedPassword) {
+            throw new Error("Usuários não registrado através de credenciais")
+        }
+
+        const matchPassword = await bcrypt.compare(credentials.password, user.hashedPassword)
+        if(!matchPassword)
+            throw new Error("Senha incorreta")
+
+        return {
+          nome: user.name,
+          email: user.email,
+          avatar: user.image
+        };
       }
     })
   ], 

@@ -1,5 +1,4 @@
 'use client'
-import { signIn } from "next-auth/react";
 
 import { cn } from "@/lib/utils";
 import React, { useState } from "react";
@@ -14,21 +13,23 @@ import { ToastAction } from "@/components/ui/toast";
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 interface IUser {
+  name: string;
   email: string;
   password: string;
 }
 
-export function LoginForm({ className, ...props }: UserAuthFormProps) {
-  // Router 
-  const router = useRouter();
-
+export function RegisterForm({ className, ...props }: UserAuthFormProps) {
   // Estados do formulário
   const [data, setData] = useState<IUser>({
+    name: "",
     email: "",
-    password: ""
-  })
+    password: "",
+  });
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  // Router
+  const router = useRouter();
 
   // Funções de controle
   const onSubmitHandler = async (event: React.SyntheticEvent) => {
@@ -36,36 +37,43 @@ export function LoginForm({ className, ...props }: UserAuthFormProps) {
 
     setIsLoading(true);
 
-    const res = await signIn<"credentials">("credentials", {
-      ...data,
-      redirect: false,
-    });
+    const response = await fetch("/api/create-user", {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json"
+      },
+      body: JSON.stringify(data)
+    })
+    
+    const resultado = await response.json();
 
-    if (res?.error) {
+    if (!response.ok) {
       toast({
-        title: "Ooops...",
-        description: res.error,
-        variant: "destructive",
+        title: 'Erro',
+        description: resultado.message,
+        variant: 'destructive',
         action: (
-          <ToastAction altText="Tente Novamente">Tente Novamente</ToastAction>
-        ),
-      });
-
-      setData({
-        email: "",
-        password: ""
+          <ToastAction altText="Tente Novamente">Tente novamente. </ToastAction>
+        )
       })
-      setIsLoading(false);
     } else {
-      router.push("/");
-    }    
+      console.log(resultado.message)
+      router.push("/login")
+    }
+
+    setData({
+      name: "",
+      email: "",
+      password: ""
+    })
+    setIsLoading(false);
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
 
     setData((oldState) => {
-      return {...oldState, [event.target.name]:[event.target.value]}
+      return {...oldState, [event.target.name]:event.target.value}
     })
   }
 
@@ -74,6 +82,24 @@ export function LoginForm({ className, ...props }: UserAuthFormProps) {
     <div className={cn("grid gap-6", className)}>
       <form onSubmit={onSubmitHandler}>
         <div className="grid gap-3">
+          <div className="grid gap-1">
+            <Label className="" htmlFor="name">
+              Nome
+            </Label>
+
+            <Input 
+              id="name"
+              name="name"
+              placeholder="Nome completo"
+              type="text"
+              autoCapitalize="none"
+              autoCorrect="off"
+              disabled={isLoading}
+              value={data.name}
+              onChange={handleChange} 
+            />
+          </div>
+
           <div className="grid gap-1">
             <Label className="" htmlFor="email">
               Email
@@ -113,7 +139,7 @@ export function LoginForm({ className, ...props }: UserAuthFormProps) {
 
           <Button disabled={isLoading}>
             {isLoading && (<Icons.spinner className="mr-2 h-4 w-4 animate-spin" />)}
-            Entrar
+            Criar Conta
           </Button>
         </div>
       </form>
