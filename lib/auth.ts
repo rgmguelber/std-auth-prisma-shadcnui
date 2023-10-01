@@ -22,6 +22,8 @@ export const authOptions: NextAuthOptions = {
         username: {label: "Nome", type: "text", placeholder: "Nome"}
       },
       async authorize(credentials, req): Promise<any> {
+        console.log('Authorize Method', credentials)
+        
         const user = { email: "test@mail.com", password: "123456", name: "Teste"}
 
         return user;
