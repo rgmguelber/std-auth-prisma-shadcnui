@@ -9,7 +9,8 @@ export default function AuthenticationPage() {
             Criar Conta
           </h1>
           <p className="text-sm text-muted-foreground">
-            Informe seu nome, e-mail e senha para cadastrar
+            Informe seu nome, e-mail e senha para cadastrar++++
+            
           </p>
         </div>
         <RegisterForm />
